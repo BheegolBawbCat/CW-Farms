@@ -110,12 +110,28 @@
 </head>
 <body class="bg-cream text-brand-dark font-sans antialiased selection:bg-syrup selection:text-white">
 
+<!-- Top Bar -->
+<div class="hidden lg:block bg-brand-dark text-amber-100/80 text-xs border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between">
+    <div class="flex items-center gap-5">
+      <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-syrup-light"></i>Brooten, MN, United States, Minnesota</span>
+      <span class="flex items-center gap-1.5 text-emerald-400 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Always Open</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <a href="tel:+13209056150" class="flex items-center gap-1.5 hover:text-white transition"><i class="fa-solid fa-phone text-syrup-light"></i>+1 320-905-6150</a>
+      <a href="mailto:cwfarmsmaple@gmail.com" class="flex items-center gap-1.5 hover:text-white transition"><i class="fa-solid fa-envelope text-syrup-light"></i>cwfarmsmaple@gmail.com</a>
+      <span class="w-1 h-1 rounded-full bg-white/20"></span>
+      <a href="#" class="flex items-center gap-1.5 hover:text-white transition"><i class="fa-brands fa-facebook text-syrup-light"></i>251 followers · 3 following</a>
+    </div>
+  </div>
+</div>
+
 <!-- Navigation -->
 <header class="sticky top-0 z-40 bg-brand-green text-white shadow-xl">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16 sm:h-20">
       <a href="#home" class="flex items-center gap-2 sm:gap-3 group">
-        <div class="font-serif text-2xl sm:text-3xl font-bold tracking-wide text-amber-50 flex items-center gap-2">
+        <div class="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-amber-50 flex items-center gap-2">
           CW Farms <span class="text-syrup-light text-xl sm:text-2xl">🍁</span>
         </div>
       </a>
@@ -151,13 +167,14 @@
 
 <!-- Hero Section -->
 <section id="home" class="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden bg-brand-dark">
-  <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-40">
-    <source src="https://assets.mixkit.co/videos/preview/mixkit-sun-rays-in-the-forest-41130-large.mp4" type="video/mp4">
-  </video>
+  <img src="assets/images/hero-bottle.jpg" alt="CW Farms Sugar Mama's maple syrup bottle" class="absolute inset-0 w-full h-full object-cover">
   <div class="absolute inset-0 hero-overlay"></div>
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
     <div class="max-w-2xl section-fade">
-      <h1 class="font-serif text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-[1.05] mb-4 sm:mb-6">
+      <span class="inline-flex items-center gap-2 px-4 py-1.5 mb-5 rounded-full bg-black/30 border border-white/20 text-amber-100 text-xs font-bold uppercase tracking-wide">
+        <span class="text-syrup-light">🍁</span> Family Owned in Brooten, MN
+      </span>
+      <h1 class="font-sans text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-[1.05] mb-4 sm:mb-6">
         Pure Maple &<br>Black Walnut Syrup
       </h1>
       <p class="text-base sm:text-lg lg:text-xl text-amber-100/90 mb-6 sm:mb-8 max-w-xl leading-relaxed font-medium">
