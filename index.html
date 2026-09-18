@@ -599,42 +599,38 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-bold text-stone-700 mb-1">Full Name *</label>
-          <input type="text" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="Your name">
+          <input id="checkoutName" type="text" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="Your name">
         </div>
         <div>
           <label class="block text-xs font-bold text-stone-700 mb-1">Phone *</label>
-          <input type="tel" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="Your phone">
+          <input id="checkoutPhone" type="tel" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="Your phone">
         </div>
       </div>
       <div>
         <label class="block text-xs font-bold text-stone-700 mb-1">Email *</label>
-        <input type="email" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="your@email.com">
+        <input id="checkoutEmail" type="email" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="your@email.com">
       </div>
       <div>
         <label class="block text-xs font-bold text-stone-700 mb-1">Fulfillment *</label>
         <div class="grid grid-cols-2 gap-2 text-xs">
           <label class="flex items-center gap-2 p-3 rounded-lg border border-stone-300 cursor-pointer hover:bg-cream has-[:checked]:border-syrup has-[:checked]:bg-syrup/5">
-            <input type="radio" name="fulfillment" value="pickup" checked class="text-syrup focus:ring-syrup"> Local Pickup
+            <input id="checkoutFulfillPickup" type="radio" name="fulfillment" value="pickup" checked class="text-syrup focus:ring-syrup" onchange="setFulfillment('pickup')"> Local Pickup
           </label>
           <label class="flex items-center gap-2 p-3 rounded-lg border border-stone-300 cursor-pointer hover:bg-cream has-[:checked]:border-syrup has-[:checked]:bg-syrup/5">
-            <input type="radio" name="fulfillment" value="shipping" class="text-syrup focus:ring-syrup"> Shipping
+            <input id="checkoutFulfillShipping" type="radio" name="fulfillment" value="shipping" class="text-syrup focus:ring-syrup" onchange="setFulfillment('shipping')"> Shipping
           </label>
         </div>
       </div>
       <div>
-        <label class="block text-xs font-bold text-stone-700 mb-1">Address (if shipping)</label>
-        <input type="text" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="Street address">
-      </div>
-      <div>
         <label class="block text-xs font-bold text-stone-700 mb-1">Order Notes</label>
-        <textarea rows="2" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="Any special instructions?"></textarea>
+        <textarea id="checkoutNotes" rows="2" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm focus:ring-2 focus:ring-syrup outline-none" placeholder="Any special instructions? (shipping address goes here too — Stripe will also collect it at payment)"></textarea>
       </div>
       <div class="p-3 bg-cream rounded-xl border border-stone-200 flex justify-between items-center text-sm">
         <span class="font-bold text-brand-dark">Order Total:</span>
         <span id="checkoutTotal" class="text-lg font-bold text-syrup-dark">$0.00</span>
       </div>
-      <button type="submit" class="w-full py-3.5 rounded-xl bg-syrup hover:bg-syrup-light text-white font-semibold transition shadow-lg flex items-center justify-center gap-2">
-        Place Order <i class="fa-solid fa-lock text-xs"></i>
+      <button type="submit" id="checkoutSubmitBtn" class="w-full py-3.5 rounded-xl bg-syrup hover:bg-syrup-light disabled:opacity-60 text-white font-semibold transition shadow-lg flex items-center justify-center gap-2">
+        Continue to Payment <i class="fa-solid fa-lock text-xs"></i>
       </button>
     </form>
   </div>
@@ -1032,7 +1028,14 @@ function toggleCart() {
 }
 
 function openCheckout() {
-  toggleCart();
+  const drawer = document.getElementById('cartDrawer');
+  if (!drawer.classList.contains('translate-x-full')) toggleCart();
+  const pickupRadio = document.getElementById('checkoutFulfillPickup');
+  const shippingRadio = document.getElementById('checkoutFulfillShipping');
+  if (pickupRadio && shippingRadio) {
+    pickupRadio.checked = fulfillment === 'pickup';
+    shippingRadio.checked = fulfillment === 'shipping';
+  }
   const modal = document.getElementById('checkoutModal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -1044,14 +1047,56 @@ function closeCheckout() {
   modal.classList.remove('flex');
 }
 
-function handleCheckoutSubmit(e) {
+async function handleCheckoutSubmit(e) {
   e.preventDefault();
-  closeCheckout();
-  cart = [];
-  updateCart();
-  const modal = document.getElementById('successModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  const submitBtn = document.getElementById('checkoutSubmitBtn');
+  const originalLabel = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = 'Redirecting to secure payment…';
+
+  const payload = {
+    items: cart.map(item => ({ id: item.id, title: item.title, price: item.price, quantity: item.quantity })),
+    fulfillment,
+    customer: {
+      name: document.getElementById('checkoutName').value,
+      phone: document.getElementById('checkoutPhone').value,
+      email: document.getElementById('checkoutEmail').value,
+      notes: document.getElementById('checkoutNotes').value,
+    },
+  };
+
+  try {
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) throw new Error(data.error || 'Checkout failed to start.');
+    window.location.href = data.url;
+  } catch (err) {
+    showToast(err.message || 'Something went wrong starting checkout.');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalLabel;
+  }
+}
+
+function handleCheckoutRedirectParams() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('checkout') === 'success') {
+    cart = [];
+    updateCart();
+    const modal = document.getElementById('successModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  } else if (params.get('checkout') === 'cancelled') {
+    showToast('Checkout was cancelled — your cart is still saved.');
+  }
+  if (params.has('checkout')) {
+    params.delete('checkout');
+    const newUrl = window.location.pathname + (params.toString() ? `?${params}` : '') + window.location.hash;
+    window.history.replaceState({}, '', newUrl);
+  }
 }
 
 function closeSuccessModal() {
@@ -1174,6 +1219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCategoryPills();
   renderProducts();
   updateCart();
+  handleCheckoutRedirectParams();
   
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
