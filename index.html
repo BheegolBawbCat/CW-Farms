@@ -665,7 +665,6 @@
             <option value="maple">Pure Maple</option>
             <option value="infused">Infused</option>
             <option value="bulk">Bulk</option>
-            <option value="walnut">Black Walnut</option>
           </select>
         </div>
         <div>
@@ -804,7 +803,7 @@ let products = [
     price: 26.99,
     size: "250 mL each",
     desc: "Vanilla & Chocolate infused maple syrup — two bottles of small-batch backyard flavor.",
-    image: "assets/images/bottle-pair.jpg",
+    image: "assets/images/bottle-multipack.jpg",
     badge: "2 Pack"
   },
   {
@@ -836,17 +835,6 @@ let products = [
     desc: "Bulk case of 100% pure maple syrup. Perfect for gifts, restaurants, or stocking up.",
     image: "data:image/svg+xml," + encodeURIComponent(caseSVG),
     badge: "Bulk"
-  },
-  {
-    id: "p6",
-    title: "Black Walnut Syrup",
-    category: "walnut",
-    price: null,
-    size: "Limited batches",
-    desc: "Rich black walnut syrup tapped and bottled in our own backyard. Availability is seasonal — call to reserve.",
-    image: "assets/images/bottle-pair.jpg",
-    badge: "Seasonal",
-    reserveOnly: true
   }
 ];
 
@@ -854,8 +842,7 @@ const categories = [
   { key: "all", label: "All Products" },
   { key: "maple", label: "Pure Maple" },
   { key: "infused", label: "Flavored & Infused" },
-  { key: "bulk", label: "Bulk Cases" },
-  { key: "walnut", label: "Black Walnut" }
+  { key: "bulk", label: "Bulk Cases" }
 ];
 
 let activeCategory = 'all';
